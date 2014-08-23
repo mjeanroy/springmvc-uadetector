@@ -3,9 +3,30 @@ package com.github.mjeanroy.springmvc.uadetector.tools;
 import net.sf.uadetector.ReadableDeviceCategory;
 import net.sf.uadetector.ReadableUserAgent;
 
+/**
+ * Browser specification that can be used to check againt:
+ * - Platform: desktop, smartphone, tablet.
+ * - Major families: Google Chrome, Firefox, Safari, Opera, Chromium and IE.
+ * - Specific versions of IE: since most of work for web developers is to check
+ * IE version, shortcuts are made to check if target browser is IE6 / 7 / 8 / 9 / 10.
+ * <p/>
+ * Implementation must be thread safe.
+ */
 public interface Browser {
 
+	/**
+	 * Get readable user agent.
+	 *
+	 * @return User Agent.
+	 */
 	ReadableUserAgent getUserAgent();
+
+	/**
+	 * Get browser name.
+	 *
+	 * @return Browser Name.
+	 */
+	String getName();
 
 	/**
 	 * Check if browser is a desktop browser.

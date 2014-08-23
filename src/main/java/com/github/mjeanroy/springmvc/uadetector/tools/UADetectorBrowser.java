@@ -20,6 +20,9 @@ import static net.sf.uadetector.UserAgentFamily.SAFARI;
 
 /**
  * Default implementation for browser.
+ * Since {@link net.sf.uadetector.ReadableUserAgent} is thread safe,
+ * this implementation is thread safe and ensure {@link com.github.mjeanroy.springmvc.uadetector.tools.Browser}
+ * contract.
  */
 public class UADetectorBrowser implements Browser {
 
@@ -38,6 +41,11 @@ public class UADetectorBrowser implements Browser {
 	@Override
 	public ReadableUserAgent getUserAgent() {
 		return userAgent;
+	}
+
+	@Override
+	public String getName() {
+		return userAgent.getName();
 	}
 
 	@Override
@@ -181,10 +189,12 @@ public class UADetectorBrowser implements Browser {
 		if (o == this) {
 			return true;
 		}
+
 		if (o instanceof UADetectorBrowser) {
 			UADetectorBrowser b = (UADetectorBrowser) o;
 			return userAgent.equals(b.userAgent);
 		}
+
 		return false;
 	}
 

@@ -1,7 +1,8 @@
 package com.github.mjeanroy.springmvc.uadetector.configuration;
 
-import java.util.List;
-
+import com.github.mjeanroy.springmvc.uadetector.resolvers.BrowserResolver;
+import com.github.mjeanroy.springmvc.uadetector.resolvers.ReadableUserAgentResolver;
+import net.sf.uadetector.UserAgentStringParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,15 +10,12 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.springframework.web.servlet.mvc.method.annotation.ServletWebArgumentResolverAdapter;
 
-import com.github.mjeanroy.springmvc.uadetector.resolvers.BrowserResolver;
-import com.github.mjeanroy.springmvc.uadetector.resolvers.ReadableUserAgentResolver;
-import net.sf.uadetector.UserAgentStringParser;
-import net.sf.uadetector.service.UADetectorServiceFactory;
+import java.util.List;
 
 @Configuration
 public class UADetectorConfiguration extends WebMvcConfigurerAdapter {
 
-	@Autowired(required = false)
+	@Autowired
 	private UserAgentStringParser parser;
 
 	@Override
@@ -28,15 +26,11 @@ public class UADetectorConfiguration extends WebMvcConfigurerAdapter {
 
 	@Bean
 	public ReadableUserAgentResolver readableUserAgentResolver() {
-		return new ReadableUserAgentResolver(parser());
+		return new ReadableUserAgentResolver(parser);
 	}
 
 	@Bean
 	public BrowserResolver browserResolver() {
-		return new BrowserResolver(parser());
-	}
-
-	private UserAgentStringParser parser() {
-		return parser != null ? parser : UADetectorServiceFactory.getResourceModuleParser();
+		return new BrowserResolver(parser);
 	}
 }
