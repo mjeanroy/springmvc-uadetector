@@ -1,29 +1,28 @@
 package com.github.mjeanroy.springmvc.uadetector.tools;
 
-import static com.github.mjeanroy.springmvc.uadetector.utils.ChromiumCondition.chromiumCondition;
-import static com.github.mjeanroy.springmvc.uadetector.utils.FirefoxCondition.firefoxCondition;
-import static com.github.mjeanroy.springmvc.uadetector.utils.GoogleChromeCondition.googleChromeCondition;
-import static com.github.mjeanroy.springmvc.uadetector.utils.IEVersionCondition.ieVersionCondition;
-import static com.github.mjeanroy.springmvc.uadetector.utils.IEVersionLessThanCondition.ieVersionLessThanCondition;
-import static com.github.mjeanroy.springmvc.uadetector.utils.InternetExplorerCondition.internetExplorerCondition;
-import static com.github.mjeanroy.springmvc.uadetector.utils.OperaCondition.operaCondition;
-import static com.github.mjeanroy.springmvc.uadetector.utils.SafariCondition.safariCondition;
-import static java.util.Arrays.asList;
-import static net.sf.uadetector.ReadableDeviceCategory.Category;
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
+import com.github.mjeanroy.springmvc.uadetector.utils.Condition;
+import net.sf.uadetector.DeviceCategory;
+import net.sf.uadetector.ReadableUserAgent;
+import net.sf.uadetector.UserAgentFamily;
+import net.sf.uadetector.VersionNumber;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import com.github.mjeanroy.springmvc.uadetector.utils.Condition;
-import net.sf.uadetector.DeviceCategory;
-import net.sf.uadetector.ReadableUserAgent;
-import net.sf.uadetector.UserAgentFamily;
-import net.sf.uadetector.VersionNumber;
+import static com.github.mjeanroy.springmvc.uadetector.utils.ChromiumCondition.chromiumCondition;
+import static com.github.mjeanroy.springmvc.uadetector.utils.FirefoxCondition.firefoxCondition;
+import static com.github.mjeanroy.springmvc.uadetector.utils.GoogleChromeCondition.googleChromeCondition;
+import static com.github.mjeanroy.springmvc.uadetector.utils.IECondition.IECondition;
+import static com.github.mjeanroy.springmvc.uadetector.utils.IEVersionCondition.ieVersionCondition;
+import static com.github.mjeanroy.springmvc.uadetector.utils.IEVersionLessThanCondition.ieVersionLessThanCondition;
+import static com.github.mjeanroy.springmvc.uadetector.utils.OperaCondition.operaCondition;
+import static com.github.mjeanroy.springmvc.uadetector.utils.SafariCondition.safariCondition;
+import static java.util.Arrays.asList;
+import static net.sf.uadetector.ReadableDeviceCategory.Category;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class UADetectorBrowserTest {
@@ -113,108 +112,99 @@ public class UADetectorBrowserTest {
 	}
 
 	@Test
-	public void it_should_if_browser_is_internet_explorer() {
-		checkInternetExplorer(UserAgentFamily.IE);
-		checkInternetExplorer(UserAgentFamily.IE_MOBILE);
+	public void it_should_check_if_browser_is_IE() {
+		Condition condition = IECondition(browser1);
+
+		checkFamily(UserAgentFamily.IE, condition);
+		checkFamily(UserAgentFamily.IE_MOBILE, condition);
 	}
 
 	@Test
 	public void it_should_check_if_browser_is_firefox() {
-		checkFirefox(UserAgentFamily.FIREFOX);
-		checkFirefox(UserAgentFamily.MOBILE_FIREFOX);
+		Condition condition = firefoxCondition(browser1);
+
+		checkFamily(UserAgentFamily.FIREFOX, condition);
+		checkFamily(UserAgentFamily.MOBILE_FIREFOX, condition);
 	}
 
 	@Test
 	public void it_should_check_if_browser_is_opera() {
-		checkOpera(UserAgentFamily.OPERA);
-		checkOpera(UserAgentFamily.OPERA_MINI);
-		checkOpera(UserAgentFamily.OPERA_MOBILE);
+		Condition condition = operaCondition(browser1);
+
+		checkFamily(UserAgentFamily.OPERA, condition);
+		checkFamily(UserAgentFamily.OPERA_MINI, condition);
+		checkFamily(UserAgentFamily.OPERA_MOBILE, condition);
 	}
 
 	@Test
 	public void it_should_check_if_browser_is_google_chrome() {
-		checkGoogleChrome(UserAgentFamily.CHROME);
-		checkGoogleChrome(UserAgentFamily.CHROME_MOBILE);
+		Condition condition = googleChromeCondition(browser1);
+
+		checkFamily(UserAgentFamily.CHROME, condition);
+		checkFamily(UserAgentFamily.CHROME_MOBILE, condition);
 	}
 
 	@Test
 	public void it_should_check_if_browser_is_chromium() {
-		checkChromium(UserAgentFamily.CHROMIUM);
+		Condition condition = chromiumCondition(browser1);
+
+		checkFamily(UserAgentFamily.CHROMIUM, condition);
 	}
 
 	@Test
 	public void it_should_check_if_browser_is_safari() {
-		checkSafari(UserAgentFamily.SAFARI);
-		checkSafari(UserAgentFamily.MOBILE_SAFARI);
+		Condition condition = safariCondition(browser1);
+
+		checkFamily(UserAgentFamily.SAFARI, condition);
+		checkFamily(UserAgentFamily.MOBILE_SAFARI, condition);
 	}
 
 	@Test
 	public void it_should_check_if_browser_is_ie_with_specific_version() {
-		checkInternetExplorerVersion(6);
-		checkInternetExplorerVersion(7);
-		checkInternetExplorerVersion(8);
-		checkInternetExplorerVersion(9);
-		checkInternetExplorerVersion(10);
-		checkInternetExplorerVersion(11);
+		checkIEVersion(6);
+		checkIEVersion(7);
+		checkIEVersion(8);
+		checkIEVersion(9);
+		checkIEVersion(10);
+		checkIEVersion(11);
 	}
 
 	@Test
 	public void it_should_check_if_browser_is_ie_with_specific_version_less_than() {
-		checkInternetExplorerVersionLessThan(6);
-		checkInternetExplorerVersionLessThan(7);
-		checkInternetExplorerVersionLessThan(8);
-		checkInternetExplorerVersionLessThan(9);
-		checkInternetExplorerVersionLessThan(10);
+		checkIEVersionLessThan(6);
+		checkIEVersionLessThan(7);
+		checkIEVersionLessThan(8);
+		checkIEVersionLessThan(9);
+		checkIEVersionLessThan(10);
 	}
 
-	private void checkInternetExplorer(UserAgentFamily family) {
-		check(family, internetExplorerCondition(browser1));
-	}
-
-	private void checkFirefox(UserAgentFamily family) {
-		check(family, firefoxCondition(browser1));
-	}
-
-	private void checkOpera(UserAgentFamily family) {
-		check(family, operaCondition(browser1));
-	}
-
-	private void checkGoogleChrome(UserAgentFamily family) {
-		check(family, googleChromeCondition(browser1));
-	}
-
-	private void checkChromium(UserAgentFamily family) {
-		check(family, chromiumCondition(browser1));
-	}
-
-	private void checkSafari(UserAgentFamily family) {
-		check(family, safariCondition(browser1));
-	}
-
-	private void checkInternetExplorerVersion(int version) {
+	private void checkIEVersion(int version) {
 		VersionNumber versionNumber = new VersionNumber(asList(String.valueOf(version)));
 		when(userAgent1.getFamily()).thenReturn(UserAgentFamily.IE);
 		when(userAgent1.getVersionNumber()).thenReturn(versionNumber);
 
 		Condition function = ieVersionCondition(browser1, version);
-		boolean isValid = function.check();
-		assertThat(isValid).isTrue();
+		assertThat(function.check())
+				.overridingErrorMessage("Expect browser to be IE %s", version)
+				.isTrue();
 	}
 
-	private void checkInternetExplorerVersionLessThan(int version) {
+	private void checkIEVersionLessThan(int version) {
 		VersionNumber versionNumber = new VersionNumber(asList(String.valueOf(version)));
 		when(userAgent1.getFamily()).thenReturn(UserAgentFamily.IE);
 		when(userAgent1.getVersionNumber()).thenReturn(versionNumber);
 
 		Condition function = ieVersionLessThanCondition(browser1, version);
-		boolean isValid = function.check();
-		assertThat(isValid).isTrue();
+		assertThat(function.check())
+				.overridingErrorMessage("Expect browser to be IE <= %s", version)
+				.isTrue();
 	}
 
-	private void check(UserAgentFamily family, Condition function) {
+	private void checkFamily(UserAgentFamily family, Condition function) {
 		when(userAgent1.getFamily()).thenReturn(family);
-		boolean isValid = function.check();
-		assertThat(isValid).isTrue();
+		assertThat(function.check())
+				.overridingErrorMessage("Browser expected to be %s", family)
+				.isTrue();
 	}
 
 	private DeviceCategory newDeviceCategory(Category category) {

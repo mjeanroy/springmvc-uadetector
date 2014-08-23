@@ -1,5 +1,9 @@
 package com.github.mjeanroy.springmvc.uadetector.tools;
 
+import net.sf.uadetector.ReadableUserAgent;
+import net.sf.uadetector.UserAgentFamily;
+
+import static java.lang.Integer.parseInt;
 import static net.sf.uadetector.ReadableDeviceCategory.Category;
 import static net.sf.uadetector.UserAgentFamily.CHROME;
 import static net.sf.uadetector.UserAgentFamily.CHROME_MOBILE;
@@ -13,9 +17,6 @@ import static net.sf.uadetector.UserAgentFamily.OPERA;
 import static net.sf.uadetector.UserAgentFamily.OPERA_MINI;
 import static net.sf.uadetector.UserAgentFamily.OPERA_MOBILE;
 import static net.sf.uadetector.UserAgentFamily.SAFARI;
-
-import net.sf.uadetector.ReadableUserAgent;
-import net.sf.uadetector.UserAgentFamily;
 
 /**
  * Default implementation for browser.
@@ -60,7 +61,7 @@ public class UADetectorBrowser implements Browser {
 	}
 
 	@Override
-	public boolean isInternetExplorer() {
+	public boolean isIE() {
 		UserAgentFamily family = userAgent.getFamily();
 		return family == IE
 				|| family == IE_MOBILE;
@@ -106,73 +107,73 @@ public class UADetectorBrowser implements Browser {
 	}
 
 	@Override
-	public boolean isInternetExplorer6() {
-		return checkInternetExplorer(6);
+	public boolean isIE6() {
+		return checkIE(6);
 	}
 
 	@Override
-	public boolean isInternetExplorer7() {
-		return checkInternetExplorer(7);
+	public boolean isIE7() {
+		return checkIE(7);
 	}
 
 	@Override
-	public boolean isInternetExplorer8() {
-		return checkInternetExplorer(8);
+	public boolean isIE8() {
+		return checkIE(8);
 	}
 
 	@Override
-	public boolean isInternetExplorer9() {
-		return checkInternetExplorer(9);
+	public boolean isIE9() {
+		return checkIE(9);
 	}
 
 	@Override
-	public boolean isInternetExplorer10() {
-		return checkInternetExplorer(10);
+	public boolean isIE10() {
+		return checkIE(10);
 	}
 
 	@Override
-	public boolean isInternetExplorer11() {
-		return checkInternetExplorer(11);
+	public boolean isIE11() {
+		return checkIE(11);
 	}
 
 	@Override
-	public boolean isInternetExplorerLessThan6() {
-		return checkInternetExplorerLessThan(6);
+	public boolean isIELessThan6() {
+		return checkIELessThan(6);
 	}
 
 	@Override
-	public boolean isInternetExplorerLessThan7() {
-		return checkInternetExplorerLessThan(7);
+	public boolean isIELessThan7() {
+		return checkIELessThan(7);
 	}
 
 	@Override
-	public boolean isInternetExplorerLessThan8() {
-		return checkInternetExplorerLessThan(8);
+	public boolean isIELessThan8() {
+		return checkIELessThan(8);
 	}
 
 	@Override
-	public boolean isInternetExplorerLessThan9() {
-		return checkInternetExplorerLessThan(9);
+	public boolean isIELessThan9() {
+		return checkIELessThan(9);
 	}
 
 	@Override
-	public boolean isInternetExplorerLessThan10() {
-		return checkInternetExplorerLessThan(10);
+	public boolean isIELessThan10() {
+		return checkIELessThan(10);
 	}
 
 	@Override
-	public boolean checkInternetExplorer(int version) {
-		return isInternetExplorer() && getMajorVersionAsNumber() == version;
+	public boolean checkIE(int version) {
+		return isIE() && getMajorVersionAsNumber() == version;
 	}
 
 	@Override
-	public boolean checkInternetExplorerLessThan(int version) {
-		return isInternetExplorer() && getMajorVersionAsNumber() <= version;
+	public boolean checkIELessThan(int version) {
+		return isIE() && getMajorVersionAsNumber() <= version;
 	}
 
 	private int getMajorVersionAsNumber() {
 		String majorVersion = getMajorVersion();
-		return Integer.valueOf(majorVersion);
+		return parseInt(majorVersion);
 	}
 
 	@Override

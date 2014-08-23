@@ -2,16 +2,36 @@ package com.github.mjeanroy.springmvc.uadetector.utils;
 
 import com.github.mjeanroy.springmvc.uadetector.tools.Browser;
 
+/**
+ * Class that check that given browser is IE in specific version and
+ * not other supported version.
+ * Used for tests only.
+ */
 public class IEVersionCondition implements Condition {
 
+	/**
+	 * Static factory.
+	 *
+	 * @param browser Target Browser.
+	 * @param version Target version.
+	 * @return Condition class.
+	 */
 	public static IEVersionCondition ieVersionCondition(Browser browser, int version) {
 		return new IEVersionCondition(browser, version);
 	}
 
-	private Browser browser;
+	/** Browser to check. */
+	private final Browser browser;
 
-	private int version;
+	/** IE Version to check. */
+	private final int version;
 
+	/**
+	 * Private constructor, use factory instead.
+	 *
+	 * @param browser Target Browser.
+	 * @param version Target version.
+	 */
 	private IEVersionCondition(Browser browser, int version) {
 		this.browser = browser;
 		this.version = version;
@@ -19,21 +39,19 @@ public class IEVersionCondition implements Condition {
 
 	@Override
 	public boolean check() {
-		switch (version) {
-			case 6:
-				return browser.isInternetExplorer6();
-			case 7:
-				return browser.isInternetExplorer7();
-			case 8:
-				return browser.isInternetExplorer8();
-			case 9:
-				return browser.isInternetExplorer9();
-			case 10:
-				return browser.isInternetExplorer10();
-			case 11:
-				return browser.isInternetExplorer11();
-			default:
-				return false;
-		}
+		return isSupportedVersion() && checkIE(version);
+	}
+
+	private boolean isSupportedVersion() {
+		return version >= 6 && version <= 11;
+	}
+
+	private boolean checkIE(int version) {
+		return browser.isIE6() == (version == 6)
+				&& browser.isIE7() == (version == 7)
+				&& browser.isIE8() == (version == 8)
+				&& browser.isIE9() == (version == 9)
+				&& browser.isIE10() == (version == 10)
+				&& browser.isIE11() == (version == 11);
 	}
 }
