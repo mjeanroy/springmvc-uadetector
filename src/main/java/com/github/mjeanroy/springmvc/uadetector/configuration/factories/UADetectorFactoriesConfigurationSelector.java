@@ -10,7 +10,7 @@ import org.springframework.core.type.AnnotationMetadata;
  * configuration class if {@link com.github.mjeanroy.springmvc.uadetector.configuration.EnableUADetector#autowired()}
  * returned true, otherwise, no additional configuration is added.
  */
-public class UADetectorFactoriesSelectorConfiguration implements ImportSelector {
+public class UADetectorFactoriesConfigurationSelector implements ImportSelector {
 
 	@Override
 	public String[] selectImports(AnnotationMetadata importingClassMetadata) {

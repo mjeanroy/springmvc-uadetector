@@ -10,7 +10,7 @@ import org.springframework.core.type.AnnotationMetadata;
  * Selector that select parser configuration according to
  * {@link com.github.mjeanroy.springmvc.uadetector.configuration.EnableUADetector} parameters.
  */
-public class UserAgentStringParserSelectorConfiguration implements ImportSelector {
+public class UserAgentStringParserConfigurationSelector implements ImportSelector {
 
 	@Override
 	public String[] selectImports(AnnotationMetadata importingClassMetadata) {

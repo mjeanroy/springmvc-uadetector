@@ -1,7 +1,7 @@
 package com.github.mjeanroy.springmvc.uadetector.configuration;
 
-import com.github.mjeanroy.springmvc.uadetector.configuration.factories.UADetectorFactoriesSelectorConfiguration;
-import com.github.mjeanroy.springmvc.uadetector.configuration.parsers.UserAgentStringParserSelectorConfiguration;
+import com.github.mjeanroy.springmvc.uadetector.configuration.factories.UADetectorFactoriesConfigurationSelector;
+import com.github.mjeanroy.springmvc.uadetector.configuration.parsers.UserAgentStringParserConfigurationSelector;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.Documented;
@@ -14,8 +14,8 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @Documented
 @Import({
-		UserAgentStringParserSelectorConfiguration.class,
-		UADetectorFactoriesSelectorConfiguration.class,
+		UserAgentStringParserConfigurationSelector.class,
+		UADetectorFactoriesConfigurationSelector.class,
 		UADetectorConfiguration.class
 })
 public @interface EnableUADetector {
