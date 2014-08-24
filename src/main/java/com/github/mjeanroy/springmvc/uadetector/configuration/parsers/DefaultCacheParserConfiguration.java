@@ -12,8 +12,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class DefaultCacheParserConfiguration {
 
-	@Bean
-	public UserAgentStringParser parser() {
+	@Bean(destroyMethod = "shutdown")
+	public UserAgentStringParser userAgentStringParser() {
 		return new CachedUserAgentStringParser();
 	}
 }

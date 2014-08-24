@@ -11,8 +11,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class NoCacheParserConfiguration {
 
-	@Bean
-	public UserAgentStringParser parser() {
+	@Bean(destroyMethod = "shutdown")
+	public UserAgentStringParser userAgentStringparser() {
 		return UADetectorServiceFactory.getResourceModuleParser();
 	}
 }
