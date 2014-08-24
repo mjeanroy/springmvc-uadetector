@@ -17,6 +17,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
+@SuppressWarnings("unchecked")
 @RunWith(MockitoJUnitRunner.class)
 public class ReadableUserAgentResolverTest {
 
