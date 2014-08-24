@@ -1,6 +1,8 @@
 package com.github.mjeanroy.springmvc.uadetector.parsers;
 
-import static com.github.mjeanroy.springmvc.uadetector.commons.LaunderThrowable.launderThrowable;
+import net.sf.uadetector.ReadableUserAgent;
+import net.sf.uadetector.UserAgentStringParser;
+import net.sf.uadetector.service.UADetectorServiceFactory;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
@@ -9,9 +11,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 
-import net.sf.uadetector.ReadableUserAgent;
-import net.sf.uadetector.UserAgentStringParser;
-import net.sf.uadetector.service.UADetectorServiceFactory;
+import static com.github.mjeanroy.springmvc.uadetector.commons.LaunderThrowable.launderThrowable;
 
 /**
  * Simple parser using a simple cache.
@@ -33,7 +33,7 @@ public class CachedUserAgentStringParser implements UserAgentStringParser {
 	 */
 	public CachedUserAgentStringParser() {
 		this.parser = UADetectorServiceFactory.getResourceModuleParser();
-		this.cache = new ConcurrentHashMap<>();
+		this.cache = new ConcurrentHashMap<String, FutureTask<ReadableUserAgent>>();
 	}
 
 	/**
@@ -43,7 +43,7 @@ public class CachedUserAgentStringParser implements UserAgentStringParser {
 	 */
 	public CachedUserAgentStringParser(UserAgentStringParser parser) {
 		this.parser = parser;
-		this.cache = new ConcurrentHashMap<>();
+		this.cache = new ConcurrentHashMap<String, FutureTask<ReadableUserAgent>>();
 	}
 
 	@Override
@@ -64,7 +64,7 @@ public class CachedUserAgentStringParser implements UserAgentStringParser {
 					}
 				};
 
-				FutureTask<ReadableUserAgent> newTask = new FutureTask<>(callable);
+				FutureTask<ReadableUserAgent> newTask = new FutureTask<ReadableUserAgent>(callable);
 				task = cache.putIfAbsent(userAgent, newTask);
 				if (task == null) {
 					task = newTask;
@@ -79,7 +79,10 @@ public class CachedUserAgentStringParser implements UserAgentStringParser {
 				cache.remove(userAgent, task);
 				// Do not return anything and retry
 			}
-			catch (ExecutionException | InterruptedException ex) {
+			catch (ExecutionException ex) {
+				throw launderThrowable(ex);
+			}
+			catch (InterruptedException ex) {
 				throw launderThrowable(ex);
 			}
 		}
