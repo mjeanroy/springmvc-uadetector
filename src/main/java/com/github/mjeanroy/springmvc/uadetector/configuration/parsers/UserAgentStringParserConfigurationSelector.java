@@ -24,11 +24,12 @@
 
 package com.github.mjeanroy.springmvc.uadetector.configuration.parsers;
 
+import org.springframework.context.annotation.ImportSelector;
+import org.springframework.core.type.AnnotationMetadata;
+
 import com.github.mjeanroy.springmvc.uadetector.commons.ClassUtils;
 import com.github.mjeanroy.springmvc.uadetector.configuration.EnableUADetector;
 import com.github.mjeanroy.springmvc.uadetector.configuration.UACacheProvider;
-import org.springframework.context.annotation.ImportSelector;
-import org.springframework.core.type.AnnotationMetadata;
 
 /**
  * Selector that select parser configuration according to
@@ -38,7 +39,7 @@ public class UserAgentStringParserConfigurationSelector implements ImportSelecto
 
 	@Override
 	public String[] selectImports(AnnotationMetadata importingClassMetadata) {
-		UACacheProvider cacheStrategy = ClassUtils.getAnnotationValue(importingClassMetadata, EnableUADetector.class, "cache", UACacheProvider.NONE);
+		UACacheProvider cacheStrategy = ClassUtils.getAnnotationValue(importingClassMetadata, EnableUADetector.class, "cache", UACacheProvider.AUTO);
 		Class klass = cacheStrategy.getConfigurationClass();
 		return new String[]{ klass.getName() };
 	}

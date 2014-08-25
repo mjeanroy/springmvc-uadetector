@@ -24,15 +24,16 @@
 
 package com.github.mjeanroy.springmvc.uadetector.configuration;
 
-import com.github.mjeanroy.springmvc.uadetector.configuration.factories.UADetectorFactoriesConfigurationSelector;
-import com.github.mjeanroy.springmvc.uadetector.configuration.parsers.UserAgentStringParserConfigurationSelector;
-import org.springframework.context.annotation.Import;
-
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+
+import org.springframework.context.annotation.Import;
+
+import com.github.mjeanroy.springmvc.uadetector.configuration.factories.UADetectorFactoriesConfigurationSelector;
+import com.github.mjeanroy.springmvc.uadetector.configuration.parsers.UserAgentStringParserConfigurationSelector;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
@@ -46,11 +47,11 @@ public @interface EnableUADetector {
 
 	/**
 	 * Disable cache or use provided implementation.
-	 * Default is no cache.
+	 * Default is {UACacheProvider#AUTO}.
 	 *
 	 * @return Cache strategy to use.
 	 */
-	UACacheProvider cache() default UACacheProvider.NONE;
+	UACacheProvider cache() default UACacheProvider.AUTO;
 
 	/**
 	 * Enable autowiring of {@link net.sf.uadetector.ReadableUserAgent}

@@ -10,14 +10,14 @@ Just add `EnableUADetector` to be able to inject `ReadableUserAgent` arguments t
 This annotation can be configured with following parameters:
 
 
-| Parameter  | Values    | Description                                                                              |
-|------------|-----------|------------------------------------------------------------------------------------------|
-| `cache`    | `NONE`    | Do not use any cache. This is the default.                                               |
-|            | `DEFAULT` | Use simple cache provided by springmvc-uadetector (use a concurrent hashmap internally). |
-|            | `GUAVA`   | Use guava cache (guava  must be on classpath).                                           |
-|            | `AUTO`    | Use guava cache if guava is available or switch to simple cache implementation.          |
-| `autowire` | `true`    | Allow ReadableUserAgent and Browser arguments to be autowired.                           |
-|            | `false`   | Disable autowiring of ReadableUserAgent and Browser arguments. This is the default.      |
+| Parameter  | Values    | Description                                                                                          |
+|------------|-----------|------------------------------------------------------------------------------------------------------|
+| `cache`    | `NONE`    | Do not use any cache.                                                                                |
+|            | `DEFAULT` | Use simple cache provided by springmvc-uadetector (use a concurrent hashmap internally).             |
+|            | `GUAVA`   | Use guava cache (guava  must be on classpath).                                                       |
+|            | `AUTO`    | Use guava cache if guava is available or switch to simple cache implementation. This is the default. |
+| `autowire` | `true`    | Allow ReadableUserAgent and Browser arguments to be autowired.                                       |
+|            | `false`   | Disable autowiring of ReadableUserAgent and Browser arguments. This is the default.                  |
 
 ## Additions
 
