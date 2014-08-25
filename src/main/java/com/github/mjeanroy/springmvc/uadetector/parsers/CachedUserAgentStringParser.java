@@ -24,18 +24,19 @@
 
 package com.github.mjeanroy.springmvc.uadetector.parsers;
 
-import net.sf.uadetector.ReadableUserAgent;
-import net.sf.uadetector.UserAgentStringParser;
-import net.sf.uadetector.service.UADetectorServiceFactory;
+import static com.github.mjeanroy.springmvc.uadetector.commons.LaunderThrowable.launderThrowable;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 
-import static com.github.mjeanroy.springmvc.uadetector.commons.LaunderThrowable.launderThrowable;
+import net.sf.uadetector.ReadableUserAgent;
+import net.sf.uadetector.UserAgentStringParser;
+import net.sf.uadetector.service.UADetectorServiceFactory;
 
 /**
  * Simple parser using a simple cache.
@@ -48,7 +49,7 @@ public class CachedUserAgentStringParser implements UserAgentStringParser {
 	private final UserAgentStringParser parser;
 
 	/** Cache of computed results. */
-	private final ConcurrentMap<String, FutureTask<ReadableUserAgent>> cache;
+	private final ConcurrentMap<String, Future<ReadableUserAgent>> cache;
 
 	/**
 	 * Build cached parser using default internal parser.
@@ -57,7 +58,7 @@ public class CachedUserAgentStringParser implements UserAgentStringParser {
 	 */
 	public CachedUserAgentStringParser() {
 		this.parser = UADetectorServiceFactory.getResourceModuleParser();
-		this.cache = new ConcurrentHashMap<String, FutureTask<ReadableUserAgent>>();
+		this.cache = new ConcurrentHashMap<String, Future<ReadableUserAgent>>();
 	}
 
 	/**
@@ -67,7 +68,7 @@ public class CachedUserAgentStringParser implements UserAgentStringParser {
 	 */
 	public CachedUserAgentStringParser(UserAgentStringParser parser) {
 		this.parser = parser;
-		this.cache = new ConcurrentHashMap<String, FutureTask<ReadableUserAgent>>();
+		this.cache = new ConcurrentHashMap<String, Future<ReadableUserAgent>>();
 	}
 
 	@Override
@@ -79,7 +80,7 @@ public class CachedUserAgentStringParser implements UserAgentStringParser {
 	public ReadableUserAgent parse(final String userAgent) {
 		// Use while true to retry parsing in case of CancellationException
 		while (true) {
-			FutureTask<ReadableUserAgent> task = cache.get(userAgent);
+			Future<ReadableUserAgent> task = cache.get(userAgent);
 			if (task == null) {
 				Callable<ReadableUserAgent> callable = new Callable<ReadableUserAgent>() {
 					@Override
@@ -104,10 +105,11 @@ public class CachedUserAgentStringParser implements UserAgentStringParser {
 				// Do not return anything and retry
 			}
 			catch (ExecutionException ex) {
-				throw launderThrowable(ex);
+				throw launderThrowable(ex.getCause());
 			}
 			catch (InterruptedException ex) {
-				throw launderThrowable(ex);
+				// Restore interrupt status
+				Thread.currentThread().interrupt();
 			}
 		}
 	}
