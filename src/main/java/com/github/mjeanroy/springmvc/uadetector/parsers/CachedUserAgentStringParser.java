@@ -24,7 +24,9 @@
 
 package com.github.mjeanroy.springmvc.uadetector.parsers;
 
-import static com.github.mjeanroy.springmvc.uadetector.commons.LaunderThrowable.launderThrowable;
+import net.sf.uadetector.ReadableUserAgent;
+import net.sf.uadetector.UserAgentStringParser;
+import net.sf.uadetector.service.UADetectorServiceFactory;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
@@ -34,9 +36,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 
-import net.sf.uadetector.ReadableUserAgent;
-import net.sf.uadetector.UserAgentStringParser;
-import net.sf.uadetector.service.UADetectorServiceFactory;
+import static com.github.mjeanroy.springmvc.uadetector.commons.LaunderThrowable.launderThrowable;
 
 /**
  * Simple parser using a simple cache.
@@ -79,7 +79,10 @@ public class CachedUserAgentStringParser implements UserAgentStringParser {
 	@Override
 	public ReadableUserAgent parse(final String userAgent) {
 		// Use while true to retry parsing in case of CancellationException
-		while (true) {
+		boolean interrupted = false;
+		ReadableUserAgent ua = null;
+
+		while (ua == null) {
 			Future<ReadableUserAgent> task = cache.get(userAgent);
 			if (task == null) {
 				Callable<ReadableUserAgent> callable = new Callable<ReadableUserAgent>() {
@@ -98,20 +101,28 @@ public class CachedUserAgentStringParser implements UserAgentStringParser {
 			}
 
 			try {
-				return task.get();
+				ua = task.get();
 			}
 			catch (CancellationException e) {
 				cache.remove(userAgent, task);
 				// Do not return anything and retry
 			}
+			catch (InterruptedException ex) {
+				cache.remove(userAgent, task);
+				interrupted = true;
+				// Do not return anything and retry
+			}
 			catch (ExecutionException ex) {
 				throw launderThrowable(ex.getCause());
 			}
-			catch (InterruptedException ex) {
-				// Restore interrupt status
-				Thread.currentThread().interrupt();
-			}
 		}
+
+		if (interrupted) {
+			// Restore interrupt status
+			Thread.currentThread().interrupt();
+		}
+
+		return ua;
 	}
 
 	@Override
