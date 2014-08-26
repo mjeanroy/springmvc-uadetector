@@ -26,6 +26,12 @@
 		</license>
 	</licenses>
 
+	<scm>
+                <connection>scm:git:git@github.com:mjeanroy/springmvc-uadetector.git</connection>
+                <developerConnection>scm:git:git@github.com:mjeanroy/springmvc-uadetector.git</developerConnection>
+                <url>https://github.com/mjeanroy/springmvc-uadetector</url>
+        </scm>
+
 	<developers>
 		<developer>
 			<id>mjeanroy</id>
