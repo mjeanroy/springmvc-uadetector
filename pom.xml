@@ -31,10 +31,10 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-                <groupId>org.sonatype.oss</groupId>
-                <artifactId>oss-parent</artifactId>
-                <version>5</version>
-        </parent>
+		<groupId>org.sonatype.oss</groupId>
+		<artifactId>oss-parent</artifactId>
+		<version>5</version>
+	</parent>
 
 	<groupId>com.github.mjeanroy</groupId>
 	<artifactId>springmvc-uadetector</artifactId>
@@ -52,10 +52,10 @@
 	</licenses>
 
 	<scm>
-                <connection>scm:git:git@github.com:mjeanroy/springmvc-uadetector.git</connection>
-                <developerConnection>scm:git:git@github.com:mjeanroy/springmvc-uadetector.git</developerConnection>
-                <url>https://github.com/mjeanroy/springmvc-uadetector</url>
-        </scm>
+		<connection>scm:git:git@github.com:mjeanroy/springmvc-uadetector.git</connection>
+		<developerConnection>scm:git:git@github.com:mjeanroy/springmvc-uadetector.git</developerConnection>
+		<url>https://github.com/mjeanroy/springmvc-uadetector</url>
+	</scm>
 
 	<developers>
 		<developer>
@@ -71,6 +71,7 @@
 		<maven.compiler.target>1.6</maven.compiler.target>
 
 		<maven-compiler-plugin.version>3.1</maven-compiler-plugin.version>
+		<apache-rat-plugin.version>0.10</apache-rat-plugin.version>
 
 		<spring.version>4.0.6.RELEASE</spring.version>
 		<uadetector-resources.version>2014.04</uadetector-resources.version>
@@ -144,6 +145,16 @@
 					<source>${maven.compiler.source}</source>
 					<target>${maven.compiler.target}</target>
 					<encoding>${project.build.sourceEncoding}</encoding>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.rat</groupId>
+				<artifactId>apache-rat-plugin</artifactId>
+				<version>${apache-rat-plugin.version}</version>
+				<configuration>
+					<excludes>
+						<exclude>README.md</exclude>
+					</excludes>
 				</configuration>
 			</plugin>
 		</plugins>
