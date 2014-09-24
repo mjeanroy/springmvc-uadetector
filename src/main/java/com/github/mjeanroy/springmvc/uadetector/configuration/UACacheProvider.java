@@ -25,8 +25,8 @@
 package com.github.mjeanroy.springmvc.uadetector.configuration;
 
 import com.github.mjeanroy.springmvc.uadetector.commons.ClassUtils;
-import com.github.mjeanroy.springmvc.uadetector.configuration.parsers.DefaultCacheParserConfiguration;
-import com.github.mjeanroy.springmvc.uadetector.configuration.parsers.GuavaCacheParserConfiguration;
+import com.github.mjeanroy.springmvc.uadetector.configuration.parsers.cache.simple.SimpleCacheParserConfiguration;
+import com.github.mjeanroy.springmvc.uadetector.configuration.parsers.cache.guava.GuavaCacheParserConfiguration;
 import com.github.mjeanroy.springmvc.uadetector.configuration.parsers.NoCacheParserConfiguration;
 
 /**
@@ -46,7 +46,7 @@ public enum UACacheProvider {
 	DEFAULT {
 		@Override
 		public Class getConfigurationClass() {
-			return DefaultCacheParserConfiguration.class;
+			return SimpleCacheParserConfiguration.class;
 		}
 	},
 
@@ -69,7 +69,7 @@ public enum UACacheProvider {
 			if (ClassUtils.isPresent("com.google.common.cache.CacheBuilder")) {
 				return GuavaCacheParserConfiguration.class;
 			} else {
-				return DefaultCacheParserConfiguration.class;
+				return SimpleCacheParserConfiguration.class;
 			}
 		}
 	};

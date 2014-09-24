@@ -22,22 +22,31 @@
  * THE SOFTWARE.
  */
 
-package com.github.mjeanroy.springmvc.uadetector.configuration.parsers;
+package com.github.mjeanroy.springmvc.uadetector.configuration.parsers.cache;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.github.mjeanroy.springmvc.uadetector.cache.UADetectorCache;
+import com.github.mjeanroy.springmvc.uadetector.parsers.CachedUserAgentStringParser;
 import net.sf.uadetector.UserAgentStringParser;
 import net.sf.uadetector.service.UADetectorServiceFactory;
 
-/**
- * Configuration that use default user agent string parser (no cache).
- */
 @Configuration
-public class NoCacheParserConfiguration {
+public abstract class AbstractCacheConfiguration {
 
 	@Bean(destroyMethod = "shutdown")
 	public UserAgentStringParser userAgentStringParser() {
-		return UADetectorServiceFactory.getResourceModuleParser();
+		UserAgentStringParser parser = UADetectorServiceFactory.getResourceModuleParser();
+		UADetectorCache cache = cache(parser);
+		return new CachedUserAgentStringParser(parser, cache);
 	}
+
+	/**
+	 * Build specific cache implementation.
+	 *
+	 * @param parser Internal parser.
+	 * @return Cache implementation.
+	 */
+	protected abstract UADetectorCache cache(UserAgentStringParser parser);
 }

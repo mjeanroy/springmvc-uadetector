@@ -22,23 +22,32 @@
  * THE SOFTWARE.
  */
 
-package com.github.mjeanroy.springmvc.uadetector.configuration.parsers;
+package com.github.mjeanroy.springmvc.uadetector.cache.guava;
 
-import com.github.mjeanroy.springmvc.uadetector.parsers.GuavaCachedUserAgentStringParser;
+import com.google.common.cache.CacheLoader;
+import net.sf.uadetector.ReadableUserAgent;
 import net.sf.uadetector.UserAgentStringParser;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 /**
- * Configuration that use a parser using a cache provided
- * by Guava library.
- * Guava must be on classpath to use it.
+ * Cache loader to user with guava version of uadetector parser.
+ * This implementation is thread safe.
  */
-@Configuration
-public class GuavaCacheParserConfiguration {
+public class GuavaCacheLoader extends CacheLoader<String, ReadableUserAgent> {
 
-	@Bean(destroyMethod = "shutdown")
-	public UserAgentStringParser userAgentStringParser() {
-		return new GuavaCachedUserAgentStringParser();
+	/** User Agent Parser. */
+	private final UserAgentStringParser parser;
+
+	/**
+	 * Build new cache loader using given parser.
+	 *
+	 * @param parser Parser.
+	 */
+	public GuavaCacheLoader(UserAgentStringParser parser) {
+		this.parser = parser;
+	}
+
+	@Override
+	public ReadableUserAgent load(String userAgent) throws Exception {
+		return parser.parse(userAgent);
 	}
 }

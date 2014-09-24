@@ -22,32 +22,43 @@
  * THE SOFTWARE.
  */
 
-package com.github.mjeanroy.springmvc.uadetector.parsers;
+package com.github.mjeanroy.springmvc.uadetector.cache.guava;
 
-import com.google.common.cache.CacheLoader;
+import com.github.mjeanroy.springmvc.uadetector.cache.AbstractUADetectorCache;
+import com.github.mjeanroy.springmvc.uadetector.cache.UADetectorCache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.LoadingCache;
 import net.sf.uadetector.ReadableUserAgent;
 import net.sf.uadetector.UserAgentStringParser;
 
 /**
- * Cache loader to user with guava version of uadetector parser.
- * This implementation is thread safe.
+ * Cache implementation using guava cache implementation.
  */
-public class GuavaReadableUserAgentCacheLoader extends CacheLoader<String, ReadableUserAgent> {
-
-	/** User Agent Parser. */
-	private final UserAgentStringParser parser;
+public class GuavaCache extends AbstractUADetectorCache implements UADetectorCache {
 
 	/**
-	 * Build new cache loader using given parser.
-	 *
-	 * @param parser Parser.
+	 * Guava cache instance use internally.
 	 */
-	public GuavaReadableUserAgentCacheLoader(UserAgentStringParser parser) {
-		this.parser = parser;
+	private final LoadingCache<String, ReadableUserAgent> cache;
+
+	/**
+	 * Create Guava cache instance.
+	 *
+	 * @param builder Guava cache builder.
+	 * @param parser User Agent parser.
+	 */
+	public GuavaCache(CacheBuilder<Object, Object> builder, UserAgentStringParser parser) {
+		super(parser);
+		this.cache = builder.build(new GuavaCacheLoader(parser));
 	}
 
 	@Override
-	public ReadableUserAgent load(String userAgent) throws Exception {
-		return parser.parse(userAgent);
+	public ReadableUserAgent get(String userAgent) {
+		return cache.getUnchecked(userAgent);
+	}
+
+	@Override
+	public void shutdown() {
+		cache.invalidateAll();
 	}
 }

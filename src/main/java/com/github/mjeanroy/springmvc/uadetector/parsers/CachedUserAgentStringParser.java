@@ -24,42 +24,27 @@
 
 package com.github.mjeanroy.springmvc.uadetector.parsers;
 
+import com.github.mjeanroy.springmvc.uadetector.cache.UADetectorCache;
+import com.github.mjeanroy.springmvc.uadetector.cache.simple.SimpleCache;
 import net.sf.uadetector.ReadableUserAgent;
 import net.sf.uadetector.UserAgentStringParser;
-import net.sf.uadetector.service.UADetectorServiceFactory;
-
-import java.util.concurrent.Callable;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.FutureTask;
-
-import static com.github.mjeanroy.springmvc.uadetector.commons.LaunderThrowable.launderThrowable;
 
 /**
- * Simple parser using a simple cache.
- * Cache implementation is freely inspired from awesome Brian Goetz Memoizer implementation
- * published in "Java Concurrent In Practice".
+ * Simple parser using a cache implementation.
+ * Cache implementation is free and must be an implementation of {@link UADetectorCache}.
  */
 public class CachedUserAgentStringParser implements UserAgentStringParser {
 
-	/** Parser implementation. */
+	/**
+	 * Parser implementation.
+	 */
 	private final UserAgentStringParser parser;
 
-	/** Cache of computed results. */
-	private final ConcurrentMap<String, Future<ReadableUserAgent>> cache;
-
 	/**
-	 * Build cached parser using default internal parser.
-	 *
-	 * Default internal parser is retrieved using {@link net.sf.uadetector.service.UADetectorServiceFactory#getResourceModuleParser()} method.
+	 * Cache implementation.
+	 * Default is to use an instance of {@link SimpleCache}.
 	 */
-	public CachedUserAgentStringParser() {
-		this.parser = UADetectorServiceFactory.getResourceModuleParser();
-		this.cache = new ConcurrentHashMap<String, Future<ReadableUserAgent>>();
-	}
+	private final UADetectorCache cache;
 
 	/**
 	 * Build cached parser using custom internal parser.
@@ -68,7 +53,19 @@ public class CachedUserAgentStringParser implements UserAgentStringParser {
 	 */
 	public CachedUserAgentStringParser(UserAgentStringParser parser) {
 		this.parser = parser;
-		this.cache = new ConcurrentHashMap<String, Future<ReadableUserAgent>>();
+		this.cache = new SimpleCache(parser);
+	}
+
+	/**
+	 * Build cached parser using custom internal parser and custom cache
+	 * implementation.
+	 *
+	 * @param parser Internal parser.
+	 * @param cache Cache implementation.
+	 */
+	public CachedUserAgentStringParser(UserAgentStringParser parser, UADetectorCache cache) {
+		this.parser = parser;
+		this.cache = cache;
 	}
 
 	@Override
@@ -78,56 +75,21 @@ public class CachedUserAgentStringParser implements UserAgentStringParser {
 
 	@Override
 	public ReadableUserAgent parse(final String userAgent) {
-		// Use while true to retry parsing in case of CancellationException
-		boolean interrupted = false;
-		ReadableUserAgent ua = null;
-
-		while (ua == null) {
-			Future<ReadableUserAgent> task = cache.get(userAgent);
-			if (task == null) {
-				Callable<ReadableUserAgent> callable = new Callable<ReadableUserAgent>() {
-					@Override
-					public ReadableUserAgent call() throws Exception {
-						return parser.parse(userAgent);
-					}
-				};
-
-				FutureTask<ReadableUserAgent> newTask = new FutureTask<ReadableUserAgent>(callable);
-				task = cache.putIfAbsent(userAgent, newTask);
-				if (task == null) {
-					task = newTask;
-					newTask.run();
-				}
-			}
-
-			try {
-				ua = task.get();
-			}
-			catch (CancellationException e) {
-				cache.remove(userAgent, task);
-				// Do not return anything and retry
-			}
-			catch (InterruptedException ex) {
-				cache.remove(userAgent, task);
-				interrupted = true;
-				// Do not return anything and retry
-			}
-			catch (ExecutionException ex) {
-				throw launderThrowable(ex.getCause());
-			}
-		}
-
-		if (interrupted) {
-			// Restore interrupt status
-			Thread.currentThread().interrupt();
-		}
-
-		return ua;
+		return cache.get(userAgent);
 	}
 
 	@Override
 	public void shutdown() {
-		cache.clear();
+		cache.shutdown();
 		parser.shutdown();
+	}
+
+	/**
+	 * Return parser used internally.
+	 *
+	 * @return Internal parser.
+	 */
+	public UserAgentStringParser getParser() {
+		return parser;
 	}
 }

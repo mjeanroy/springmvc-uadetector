@@ -22,22 +22,31 @@
  * THE SOFTWARE.
  */
 
-package com.github.mjeanroy.springmvc.uadetector.configuration.parsers;
+package com.github.mjeanroy.springmvc.uadetector.configuration.parsers.cache.guava;
 
-import org.springframework.context.annotation.Bean;
+import java.util.concurrent.TimeUnit;
+
 import org.springframework.context.annotation.Configuration;
 
+import com.github.mjeanroy.springmvc.uadetector.cache.UADetectorCache;
+import com.github.mjeanroy.springmvc.uadetector.cache.guava.GuavaCache;
+import com.github.mjeanroy.springmvc.uadetector.configuration.parsers.cache.AbstractCacheConfiguration;
+import com.google.common.cache.CacheBuilder;
 import net.sf.uadetector.UserAgentStringParser;
-import net.sf.uadetector.service.UADetectorServiceFactory;
 
 /**
- * Configuration that use default user agent string parser (no cache).
+ * Configuration that use a parser using a cache provided
+ * by Guava library.
+ * Guava must be on classpath to use it.
  */
 @Configuration
-public class NoCacheParserConfiguration {
+public class GuavaCacheParserConfiguration extends AbstractCacheConfiguration {
 
-	@Bean(destroyMethod = "shutdown")
-	public UserAgentStringParser userAgentStringParser() {
-		return UADetectorServiceFactory.getResourceModuleParser();
+	protected UADetectorCache cache(UserAgentStringParser parser) {
+		CacheBuilder<Object, Object> builder = CacheBuilder.newBuilder()
+				.maximumSize(100)
+				.expireAfterWrite(2, TimeUnit.HOURS);
+
+		return new GuavaCache(builder, parser);
 	}
 }

@@ -24,21 +24,19 @@
 
 package com.github.mjeanroy.springmvc.uadetector.parsers;
 
-import net.sf.uadetector.ReadableUserAgent;
-import net.sf.uadetector.UserAgentStringParser;
-import net.sf.uadetector.parser.UserAgentStringParserImpl;
+import static org.apache.commons.lang3.reflect.FieldUtils.readField;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.util.concurrent.ConcurrentHashMap;
-
-import static org.apache.commons.lang3.reflect.FieldUtils.readField;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import com.github.mjeanroy.springmvc.uadetector.cache.UADetectorCache;
+import com.github.mjeanroy.springmvc.uadetector.cache.simple.SimpleCache;
+import net.sf.uadetector.ReadableUserAgent;
+import net.sf.uadetector.UserAgentStringParser;
 
 @SuppressWarnings("unchecked")
 @RunWith(MockitoJUnitRunner.class)
@@ -48,38 +46,20 @@ public class CachedUserAgentStringParserTest {
 	private UserAgentStringParser parser;
 
 	@Mock
+	private UADetectorCache cache;
+
+	@Mock
 	private ReadableUserAgent userAgent;
 
 	@Test
-	public void it_should_build_guava_parser_with_default_parser() throws Exception {
-		CachedUserAgentStringParser cachedParser = new CachedUserAgentStringParser();
-
-		UserAgentStringParser internalParser = (UserAgentStringParser) readField(cachedParser, "parser", true);
-		ConcurrentHashMap internalCache = (ConcurrentHashMap) readField(cachedParser, "cache", true);
-
-		assertThat(internalParser)
-				.isNotNull()
-				.isExactlyInstanceOf(UserAgentStringParserImpl.class);
-
-		assertThat(internalCache)
-				.isNotNull()
-				.isExactlyInstanceOf(ConcurrentHashMap.class);
-	}
-
-	@Test
-	public void it_should_build_guava_parser_with_custom_parser() throws Exception {
+	public void it_should_build_cached_parser_with_custom_parser() throws Exception {
 		CachedUserAgentStringParser cachedParser = new CachedUserAgentStringParser(parser);
 
 		UserAgentStringParser internalParser = (UserAgentStringParser) readField(cachedParser, "parser", true);
-		ConcurrentHashMap internalCache = (ConcurrentHashMap) readField(cachedParser, "cache", true);
+		UADetectorCache internalCache = (UADetectorCache) readField(cachedParser, "cache", true);
 
-		assertThat(internalParser)
-				.isNotNull()
-				.isSameAs(parser);
-
-		assertThat(internalCache)
-				.isNotNull()
-				.isExactlyInstanceOf(ConcurrentHashMap.class);
+		assertThat(internalParser).isNotNull().isSameAs(parser);
+		assertThat(internalCache).isNotNull().isExactlyInstanceOf(SimpleCache.class);
 	}
 
 	@Test
@@ -91,10 +71,7 @@ public class CachedUserAgentStringParserTest {
 
 		String dataVersion = cachedParser.getDataVersion();
 
-		assertThat(dataVersion)
-				.isNotNull()
-				.isEqualTo(dv);
-
+		assertThat(dataVersion).isNotNull().isEqualTo(dv);
 		verify(parser).getDataVersion();
 	}
 
@@ -103,16 +80,11 @@ public class CachedUserAgentStringParserTest {
 		String dv = "foo";
 		when(parser.getDataVersion()).thenReturn(dv);
 
-		CachedUserAgentStringParser cachedParser = new CachedUserAgentStringParser(parser);
-
-		ConcurrentHashMap internalCache = (ConcurrentHashMap) readField(cachedParser, "cache", true);
-		internalCache.put("foo", "bar");
-		assertThat(internalCache).containsKey("foo");
-
+		CachedUserAgentStringParser cachedParser = new CachedUserAgentStringParser(parser, cache);
 		cachedParser.shutdown();
 
 		verify(parser).shutdown();
-		assertThat(internalCache).doesNotContainKey("foo");
+		verify(cache).shutdown();
 	}
 
 	@Test
@@ -124,10 +96,7 @@ public class CachedUserAgentStringParserTest {
 
 		ReadableUserAgent result = cachedParser.parse(ua);
 
-		assertThat(result)
-				.isNotNull()
-				.isSameAs(userAgent);
-
+		assertThat(result).isNotNull().isSameAs(userAgent);
 		verify(parser).parse(ua);
 	}
 
@@ -141,14 +110,8 @@ public class CachedUserAgentStringParserTest {
 		ReadableUserAgent result1 = cachedParser.parse(ua);
 		ReadableUserAgent result2 = cachedParser.parse(ua);
 
-		assertThat(result1)
-				.isNotNull()
-				.isSameAs(userAgent);
-
-		assertThat(result2)
-				.isNotNull()
-				.isSameAs(userAgent);
-
+		assertThat(result1).isNotNull().isSameAs(userAgent);
+		assertThat(result2).isNotNull().isSameAs(userAgent);
 		verify(parser, times(1)).parse(ua);
 	}
 }

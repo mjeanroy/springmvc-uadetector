@@ -22,40 +22,20 @@
  * THE SOFTWARE.
  */
 
-package com.github.mjeanroy.springmvc.uadetector.parsers;
+package com.github.mjeanroy.springmvc.uadetector.cache;
 
-import net.sf.uadetector.ReadableUserAgent;
 import net.sf.uadetector.UserAgentStringParser;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import net.sf.uadetector.service.UADetectorServiceFactory;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+public abstract class AbstractUADetectorCache implements UADetectorCache {
 
-@RunWith(MockitoJUnitRunner.class)
-public class GuavaReadableUserAgentCacheLoaderTest {
+	protected final UserAgentStringParser parser;
 
-	@Mock
-	private UserAgentStringParser parser;
+	protected AbstractUADetectorCache() {
+		this.parser = UADetectorServiceFactory.getResourceModuleParser();
+	}
 
-	@Mock
-	private ReadableUserAgent userAgent;
-
-	@Test
-	public void it_should_load_user_agent_from_parser() throws Exception {
-		String userAgentKey = "foo";
-		when(parser.parse(userAgentKey)).thenReturn(userAgent);
-
-		GuavaReadableUserAgentCacheLoader cacheLoader = new GuavaReadableUserAgentCacheLoader(parser);
-		ReadableUserAgent result = cacheLoader.load(userAgentKey);
-
-		assertThat(result)
-				.isNotNull()
-				.isEqualTo(userAgent);
-
-		verify(parser).parse(userAgentKey);
+	protected AbstractUADetectorCache(UserAgentStringParser parser) {
+		this.parser = parser;
 	}
 }

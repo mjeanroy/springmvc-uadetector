@@ -22,22 +22,40 @@
  * THE SOFTWARE.
  */
 
-package com.github.mjeanroy.springmvc.uadetector.configuration.parsers;
+package com.github.mjeanroy.springmvc.uadetector.cache.guava;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
+
+import net.sf.uadetector.ReadableUserAgent;
 import net.sf.uadetector.UserAgentStringParser;
-import net.sf.uadetector.service.UADetectorServiceFactory;
 
-/**
- * Configuration that use default user agent string parser (no cache).
- */
-@Configuration
-public class NoCacheParserConfiguration {
+@RunWith(MockitoJUnitRunner.class)
+public class GuavaCacheLoaderTest {
 
-	@Bean(destroyMethod = "shutdown")
-	public UserAgentStringParser userAgentStringParser() {
-		return UADetectorServiceFactory.getResourceModuleParser();
+	@Mock
+	private UserAgentStringParser parser;
+
+	@Mock
+	private ReadableUserAgent userAgent;
+
+	@Test
+	public void it_should_load_user_agent_from_parser() throws Exception {
+		String userAgentKey = "foo";
+		when(parser.parse(userAgentKey)).thenReturn(userAgent);
+
+		GuavaCacheLoader cacheLoader = new GuavaCacheLoader(parser);
+		ReadableUserAgent result = cacheLoader.load(userAgentKey);
+
+		assertThat(result)
+				.isNotNull()
+				.isEqualTo(userAgent);
+
+		verify(parser).parse(userAgentKey);
 	}
 }

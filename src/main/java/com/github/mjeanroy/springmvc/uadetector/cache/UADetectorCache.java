@@ -22,22 +22,27 @@
  * THE SOFTWARE.
  */
 
-package com.github.mjeanroy.springmvc.uadetector.configuration.parsers;
+package com.github.mjeanroy.springmvc.uadetector.cache;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-
-import net.sf.uadetector.UserAgentStringParser;
-import net.sf.uadetector.service.UADetectorServiceFactory;
+import net.sf.uadetector.ReadableUserAgent;
 
 /**
- * Configuration that use default user agent string parser (no cache).
+ * Simple cache specification used with UADetector parser.
  */
-@Configuration
-public class NoCacheParserConfiguration {
+public interface UADetectorCache {
 
-	@Bean(destroyMethod = "shutdown")
-	public UserAgentStringParser userAgentStringParser() {
-		return UADetectorServiceFactory.getResourceModuleParser();
-	}
+	/**
+	 * This method get value associated with user agent in cache.
+	 * Be careful, the implementation must compute result and store it in cache
+	 * if result is not already in cache.
+	 *
+	 * @param userAgent User agent value.
+	 * @return User agent result.
+	 */
+	ReadableUserAgent get(String userAgent);
+
+	/**
+	 * Clear cache (i.e. invalidate) entries.
+	 */
+	void shutdown();
 }
