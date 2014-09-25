@@ -74,6 +74,7 @@
 		<spring.version>4.0.6.RELEASE</spring.version>
 		<uadetector-resources.version>2014.04</uadetector-resources.version>
 		<guava.version>17.0</guava.version>
+		<ehcache.version>2.8.4</ehcache.version>
 		<junit.version>4.11</junit.version>
 		<mockito.version>1.9.5</mockito.version>
 		<assertj.version>1.6.1</assertj.version>
@@ -104,6 +105,12 @@
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 			<version>${guava.version}</version>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.ehcache</groupId>
+			<artifactId>ehcache</artifactId>
+			<version>${ehcache.version}</version>
 			<optional>true</optional>
 		</dependency>
 
