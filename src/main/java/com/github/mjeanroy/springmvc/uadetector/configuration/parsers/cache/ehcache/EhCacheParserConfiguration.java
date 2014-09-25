@@ -22,31 +22,35 @@
  * THE SOFTWARE.
  */
 
-package com.github.mjeanroy.springmvc.uadetector.configuration.parsers.cache.guava;
-
-import java.util.concurrent.TimeUnit;
+package com.github.mjeanroy.springmvc.uadetector.configuration.parsers.cache.ehcache;
 
 import org.springframework.context.annotation.Configuration;
 
 import com.github.mjeanroy.springmvc.uadetector.cache.UADetectorCache;
-import com.github.mjeanroy.springmvc.uadetector.cache.guava.GuavaCache;
+import com.github.mjeanroy.springmvc.uadetector.cache.ehcache.EhCacheCache;
 import com.github.mjeanroy.springmvc.uadetector.configuration.parsers.cache.AbstractCacheConfiguration;
-import com.google.common.cache.CacheBuilder;
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.config.CacheConfiguration;
 import net.sf.uadetector.UserAgentStringParser;
 
 /**
  * Configuration that use a parser using a cache provided
- * by Guava library.
- * Guava must be on classpath to use it.
+ * by ehcache library.
+ * EhCache must be on classpath to use it.
  */
 @Configuration
-public class GuavaCacheParserConfiguration extends AbstractCacheConfiguration {
+public class EhCacheParserConfiguration extends AbstractCacheConfiguration {
 
 	protected UADetectorCache cache(UserAgentStringParser parser) {
-		CacheBuilder<Object, Object> builder = CacheBuilder.newBuilder()
-				.maximumSize(getMaximumSize())
-				.expireAfterWrite(getTimeToLiveInSeconds(), TimeUnit.SECONDS);
+		CacheManager cacheManager = CacheManager.getInstance();
 
-		return new GuavaCache(builder, parser);
+		Cache ehCache = cacheManager.getCache("uadetector");
+		CacheConfiguration configuration = ehCache.getCacheConfiguration();
+		configuration.setMemoryStoreEvictionPolicy("LRU");
+		configuration.setMaxEntriesLocalHeap(getMaximumSize());
+		configuration.setTimeToLiveSeconds(getTimeToLiveInSeconds());
+
+		return new EhCacheCache(ehCache, parser);
 	}
 }

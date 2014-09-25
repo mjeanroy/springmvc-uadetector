@@ -24,16 +24,46 @@
 
 package com.github.mjeanroy.springmvc.uadetector.configuration.parsers.cache;
 
+import static java.lang.Long.parseLong;
+import static java.lang.String.valueOf;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
 
 import com.github.mjeanroy.springmvc.uadetector.cache.UADetectorCache;
 import com.github.mjeanroy.springmvc.uadetector.parsers.CachedUserAgentStringParser;
 import net.sf.uadetector.UserAgentStringParser;
 import net.sf.uadetector.service.UADetectorServiceFactory;
 
+/**
+ * Abstract configuration that define uadetector configuration based on
+ * cache implementation.
+ * The cache implementation must be provided by subclasses.
+ */
 @Configuration
+@PropertySource(
+		value = "classpath:uadetector.properties",
+		ignoreResourceNotFound = true
+)
 public abstract class AbstractCacheConfiguration {
+
+	/**
+	 * Default cache size.
+	 * The default is 100.
+	 */
+	public static final long DEFAULT_MAXIMUM_SIZE = 100;
+
+	/**
+	 * Default Time To Live (TTL) value.
+	 * The default is one day.
+	 */
+	public static final long DEFAULT_TTL = 3600 * 24;
+
+	@Autowired
+	private Environment environment;
 
 	@Bean(destroyMethod = "shutdown")
 	public UserAgentStringParser userAgentStringParser() {
@@ -49,4 +79,21 @@ public abstract class AbstractCacheConfiguration {
 	 * @return Cache implementation.
 	 */
 	protected abstract UADetectorCache cache(UserAgentStringParser parser);
+
+	/**
+	 * Get maximum size of cache.
+	 *
+	 * @return Maximum cache size.
+	 */
+	protected long getMaximumSize() {
+		return parseLong(environment.getProperty("uadetector.maxSize", valueOf(DEFAULT_MAXIMUM_SIZE)));
+	}
+
+	/**
+	 * Get TTL (Time To Live) value: this is the time entries are stored in cache before being evicted.
+	 * @return Time To Live value.
+	 */
+	protected long getTimeToLiveInSeconds() {
+		return parseLong(environment.getProperty("uadetector.ttl", valueOf(DEFAULT_TTL)));
+	}
 }

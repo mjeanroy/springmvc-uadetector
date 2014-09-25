@@ -25,16 +25,24 @@
 package com.github.mjeanroy.springmvc.uadetector.configuration;
 
 import com.github.mjeanroy.springmvc.uadetector.commons.ClassUtils;
+import com.github.mjeanroy.springmvc.uadetector.configuration.parsers.cache.ehcache.EhCacheParserConfiguration;
 import com.github.mjeanroy.springmvc.uadetector.configuration.parsers.cache.simple.SimpleCacheParserConfiguration;
 import com.github.mjeanroy.springmvc.uadetector.configuration.parsers.cache.guava.GuavaCacheParserConfiguration;
 import com.github.mjeanroy.springmvc.uadetector.configuration.parsers.NoCacheParserConfiguration;
 
 /**
  * Cache strategies.
+ * At this time, following strategies are available:
+ * - No cache.
+ * - Cache implemented with Guava cache objects.
+ * - Cache implemented with ehcache library.
+ * - Auto: try to find the best cache implementation available on classpath.
  */
 public enum UACacheProvider {
 
-	/** Do not use any cache. */
+	/**
+	 * Do not use any cache.
+	 */
 	NONE {
 		@Override
 		public Class getConfigurationClass() {
@@ -42,7 +50,9 @@ public enum UACacheProvider {
 		}
 	},
 
-	/** Use default cache, using concurrent map. */
+	/**
+	 * Use default cache, using concurrent map.
+	 */
 	DEFAULT {
 		@Override
 		public Class getConfigurationClass() {
@@ -50,7 +60,9 @@ public enum UACacheProvider {
 		}
 	},
 
-	/** Use Guava Cache implementation. */
+	/**
+	 * Use Guava Cache implementation.
+	 */
 	GUAVA {
 		@Override
 		public Class getConfigurationClass() {
@@ -59,17 +71,35 @@ public enum UACacheProvider {
 	},
 
 	/**
+	 * Use EhCache implementation.
+	 */
+	EH_CACHE {
+		@Override
+		public Class getConfigurationClass() {
+			return EhCacheParserConfiguration.class;
+		}
+	},
+
+	/**
 	 * Auto Detect cache implementation:
-	 * - If Guava is on classpath, use guava cache loader.
+	 * - If EhCache is on classpath, use ehcache
+	 * - Then, if Guava is on classpath, use guava cache loader.
 	 * - Otherwise use default cache implementation.
 	 */
 	AUTO {
 		@Override
 		public Class getConfigurationClass() {
-			if (ClassUtils.isPresent("com.google.common.cache.CacheBuilder")) {
-				return GuavaCacheParserConfiguration.class;
-			} else {
-				return SimpleCacheParserConfiguration.class;
+			if (ClassUtils.isPresent("net.sf.ehcache.Cache")) {
+				// First try to find ehcache
+				return EH_CACHE.getConfigurationClass();
+			}
+			else if (ClassUtils.isPresent("com.google.common.cache.CacheBuilder")) {
+				// Then Guava
+				return GUAVA.getConfigurationClass();
+			}
+			else {
+				// Then default
+				return DEFAULT.getConfigurationClass();
 			}
 		}
 	};
