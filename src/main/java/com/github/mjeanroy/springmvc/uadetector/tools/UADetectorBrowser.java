@@ -24,9 +24,7 @@
 
 package com.github.mjeanroy.springmvc.uadetector.tools;
 
-import net.sf.uadetector.ReadableUserAgent;
-import net.sf.uadetector.UserAgentFamily;
-
+import static com.github.mjeanroy.springmvc.uadetector.commons.PreConditions.notNull;
 import static java.lang.Integer.parseInt;
 import static net.sf.uadetector.ReadableDeviceCategory.Category;
 import static net.sf.uadetector.UserAgentFamily.CHROME;
@@ -41,6 +39,9 @@ import static net.sf.uadetector.UserAgentFamily.OPERA;
 import static net.sf.uadetector.UserAgentFamily.OPERA_MINI;
 import static net.sf.uadetector.UserAgentFamily.OPERA_MOBILE;
 import static net.sf.uadetector.UserAgentFamily.SAFARI;
+
+import net.sf.uadetector.ReadableUserAgent;
+import net.sf.uadetector.UserAgentFamily;
 
 /**
  * Default implementation for browser.
@@ -59,7 +60,7 @@ public class UADetectorBrowser implements Browser {
 	 * @param userAgent User Agent.
 	 */
 	public UADetectorBrowser(ReadableUserAgent userAgent) {
-		this.userAgent = userAgent;
+		this.userAgent = notNull(userAgent, "User Agent must not be null");
 	}
 
 	@Override

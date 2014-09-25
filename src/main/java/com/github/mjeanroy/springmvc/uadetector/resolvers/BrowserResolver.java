@@ -24,14 +24,17 @@
 
 package com.github.mjeanroy.springmvc.uadetector.resolvers;
 
+import static com.github.mjeanroy.springmvc.uadetector.commons.PreConditions.notNull;
+
+import org.springframework.core.MethodParameter;
+import org.springframework.web.bind.support.WebArgumentResolver;
+import org.springframework.web.context.request.NativeWebRequest;
+
 import com.github.mjeanroy.springmvc.uadetector.tools.Browser;
 import com.github.mjeanroy.springmvc.uadetector.tools.UADetectorBrowser;
 import net.sf.uadetector.ReadableUserAgent;
 import net.sf.uadetector.UserAgentStringParser;
 import net.sf.uadetector.service.UADetectorServiceFactory;
-import org.springframework.core.MethodParameter;
-import org.springframework.web.bind.support.WebArgumentResolver;
-import org.springframework.web.context.request.NativeWebRequest;
 
 /**
  * Resolver that can be used to get user agent arguments.
@@ -55,7 +58,7 @@ public class BrowserResolver implements WebArgumentResolver {
 	 * @param parser Parser.
 	 */
 	public BrowserResolver(UserAgentStringParser parser) {
-		this.parser = parser;
+		this.parser = notNull(parser, "Parser must not be null");
 	}
 
 	@Override

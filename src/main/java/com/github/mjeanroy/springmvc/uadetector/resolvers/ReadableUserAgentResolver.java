@@ -24,6 +24,8 @@
 
 package com.github.mjeanroy.springmvc.uadetector.resolvers;
 
+import static com.github.mjeanroy.springmvc.uadetector.commons.PreConditions.notNull;
+
 import org.springframework.core.MethodParameter;
 import org.springframework.web.bind.support.WebArgumentResolver;
 import org.springframework.web.context.request.NativeWebRequest;
@@ -56,7 +58,7 @@ public class ReadableUserAgentResolver implements WebArgumentResolver {
 	 * @param parser Parser.
 	 */
 	public ReadableUserAgentResolver(UserAgentStringParser parser) {
-		this.parser = parser;
+		this.parser = notNull(parser, "Parser must not be null");
 	}
 
 	@Override

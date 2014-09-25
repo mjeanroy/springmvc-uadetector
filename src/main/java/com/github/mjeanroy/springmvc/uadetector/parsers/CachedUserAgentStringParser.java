@@ -24,6 +24,8 @@
 
 package com.github.mjeanroy.springmvc.uadetector.parsers;
 
+import static com.github.mjeanroy.springmvc.uadetector.commons.PreConditions.notNull;
+
 import com.github.mjeanroy.springmvc.uadetector.cache.UADetectorCache;
 import com.github.mjeanroy.springmvc.uadetector.cache.simple.SimpleCache;
 import net.sf.uadetector.ReadableUserAgent;
@@ -51,8 +53,8 @@ public class CachedUserAgentStringParser implements UserAgentStringParser {
 	 *
 	 * @param parser Internal parser.
 	 */
-	public CachedUserAgentStringParser(UserAgentStringParser parser) {
-		this.parser = parser;
+	public CachedUserAgentStringParser(final UserAgentStringParser parser) {
+		this.parser = notNull(parser, "Parser must not be null");
 		this.cache = new SimpleCache(parser);
 	}
 
@@ -63,9 +65,9 @@ public class CachedUserAgentStringParser implements UserAgentStringParser {
 	 * @param parser Internal parser.
 	 * @param cache Cache implementation.
 	 */
-	public CachedUserAgentStringParser(UserAgentStringParser parser, UADetectorCache cache) {
-		this.parser = parser;
-		this.cache = cache;
+	public CachedUserAgentStringParser(final UserAgentStringParser parser, final UADetectorCache cache) {
+		this.parser = notNull(parser, "Parser must not be null");
+		this.cache = notNull(cache, "Cache must not be null");
 	}
 
 	@Override
